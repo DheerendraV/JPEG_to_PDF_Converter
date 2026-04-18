@@ -1,0 +1,30 @@
+name: Image Conversion Trigger
+on:
+  push:
+    paths:
+      - 'file_to_convert/*.jpg'
+      - 'file_to_convert/*.jpeg'
+
+jobs:
+  upload-to-s3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload to S3
+        run: |
+          FILE=$(git diff --name-only HEAD^ HEAD | grep 'file_to_convert/' | head -n 1)
+          if [ -z "$FILE" ]; then exit 0; fi
+          
+          DATE=$(date +%m-%d-%Y)
+          aws s3 cp "$FILE" "s3://your-raw-bucket/$DATE/$(basename "$FILE")"
