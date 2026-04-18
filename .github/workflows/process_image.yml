@@ -1,4 +1,9 @@
 name: Image Conversion Trigger
+
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
     paths:
@@ -17,14 +22,17 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::943755888375:role/Github-image-converter
+          aws-region: us-east-2
 
       - name: Upload to S3
         run: |
           FILE=$(git diff --name-only HEAD^ HEAD | grep 'file_to_convert/' | head -n 1)
           if [ -z "$FILE" ]; then exit 0; fi
           
+          FILENAME=$(basename "$FILE" | cut -d. -f1)
+          EXTENSION="${FILE##*.}"
           DATE=$(date +%m-%d-%Y)
-          aws s3 cp "$FILE" "s3://your-raw-bucket/$DATE/$(basename "$FILE")"
+          NEW_NAME="${FILENAME}_${DATE}.${EXTENSION}"
+          
+          aws s3 cp "$FILE" "s3://image-convert-erraw/$NEW_NAME"
