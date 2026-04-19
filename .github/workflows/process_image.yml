@@ -22,7 +22,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::943755888375:role/Github-image-converter
+          role-to-assume: arn:aws:iam::943755888375:role/
           aws-region: us-east-2
 
       - name: Upload to S3
@@ -35,4 +35,4 @@ jobs:
           DATE=$(date +%m-%d-%Y)
           NEW_NAME="${FILENAME}_${DATE}.${EXTENSION}"
           
-          aws s3 cp "$FILE" "s3://mage-convert-erraw/$NEW_NAME"
+          aws s3 cp "$FILE" "s3://image-convert-erraw/$NEW_NAME"
