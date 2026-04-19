@@ -35,4 +35,4 @@ jobs:
           DATE=$(date +%m-%d-%Y)
           NEW_NAME="${FILENAME}_${DATE}.${EXTENSION}"
           
-          aws s3 cp "$FILE" "s3://image-convert-erraw/$NEW_NAME"
+          aws s3 cp "$FILE" "s3://mage-convert-erraw/$NEW_NAME"
